@@ -10,7 +10,7 @@
 
 /* ---- Page basics ---- */
 body {
-  background-color:#CC5500;         /* burnt orange background */
+  background-color:#2D68C4;         /* burnt orange background */
   color: #14213D;                     /* navy text for contrast  */
   font-family: Georgia, "Times New Roman", serif;
   max-width: 900px;
@@ -187,3 +187,6 @@ hr {
   /* Stack contact links on small screens */
   .contact-line {
     font-size: 15px;
+  }
+}
+
