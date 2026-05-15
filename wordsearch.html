@@ -1,123 +1,208 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Word Search - Elias Valenzuela</title>
-
-  <style>
-    body {
-      text-align: center;
-      font-family: Arial;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(12, 30px);
-      gap: 5px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .cell {
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
-      border: 1px solid black;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .selected { background: lightblue; }
-    .found { background: lightgreen; }
-  </style>
+  <title>Word Search – Elias Valenzuela</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Word Search</h1>
+<!-- ✅ Navigation Bar -->
+<div class="nav-bar">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="wordsearch.html" class="nav-link nav-active">🔤 Word Search</a>
+</div>
 
-<div class="grid" id="grid"></div>
+<h1 class="page-title">Word Search</h1>
 
-<p id="words"></p>
+<!-- ✅ Grid -->
+<div id="grid" class="grid"></div>
 
-<p><a href="index.html">⬅ Back to Home</a></p>
+<!-- ✅ Words -->
+<h3>Find These Words:</h3>
+<p id="word-list"></p>
+
+<!-- ✅ Reset -->
+<div style="text-align:center; margin-top: 20px;">
+  <button onclick="resetGame()" class="reset-btn">🔄 New Game</button>
+</div>
+
+<footer class="page-footer">
+  Copyright &copy; 2026 Elias Valenzuela
+</footer>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 35px);
+  gap: 5px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.cell {
+  width: 35px;
+  height: 35px;
+  border: 2px solid #3D2D13;
+  text-align: center;
+  line-height: 35px;
+  font-weight: bold;
+  background-color: #E8DCC4;
+  cursor: pointer;
+  user-select: none;
+}
+
+.selected { background-color: lightblue; }
+.found { background-color: lightgreen; }
+
+.reset-btn {
+  background-color: #3D2D13;
+  color: #E8DCC4;
+  border: 2px solid #E8DCC4;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+</style>
 
 <script>
 const words = [
-"TEXAS","AUSTIN","BUSINESS","HEB","SHOPPER",
-"LEADERSHIP","TRAVEL","GOALS","SUCCESS","TEAM",
-"MCCOMBS","STUDENT","ENERGY","MUSIC","SPORT",
-"FOCUS","DRIVE","GROWTH","VISION","CREATE"
+"TEXAS","AUSTIN","HEB","TEAM","GOALS",
+"DRIVE","FOCUS","SPORT","MUSIC","TRAVEL"
 ];
 
-const size = 12;
-let grid = Array(size).fill().map(() => Array(size).fill(""));
-
-function placeWord(word) {
-  let placed = false;
-  while (!placed) {
-    let dir = Math.random() > 0.5;
-    let row = Math.floor(Math.random() * size);
-    let col = Math.floor(Math.random() * size);
-
-    if (dir && col + word.length < size) {
-      let ok = true;
-      for (let i=0;i<word.length;i++) if(grid[row][col+i]!="") ok=false;
-      if(ok){
-        for (let i=0;i<word.length;i++) grid[row][col+i]=word[i];
-        placed=true;
-      }
-    }
-
-    if (!dir && row + word.length < size) {
-      let ok = true;
-      for (let i=0;i<word.length;i++) if(grid[row+i][col]!="") ok=false;
-      if(ok){
-        for (let i=0;i<word.length;i++) grid[row+i][col]=word[i];
-        placed=true;
-      }
-    }
-  }
-}
-
-words.forEach(placeWord);
-
-for (let r=0;r<size;r++){
-  for (let c=0;c<size;c++){
-    if(grid[r][c]==""){
-      grid[r][c]=String.fromCharCode(65+Math.floor(Math.random()*26));
-    }
-  }
-}
-
-const gridDiv = document.getElementById("grid");
+const size = 10;
+let grid = [];
 let selected = [];
+let isDragging = false;
 
-grid.forEach((row)=>{
-  row.forEach((letter)=>{
-    let cell=document.createElement("div");
-    cell.className="cell";
-    cell.textContent=letter;
+function init() {
+  grid = Array(size).fill().map(() => Array(size).fill(""));
 
-    cell.onclick=()=>{
-      cell.classList.toggle("selected");
-      selected.push(letter);
-      let word=selected.join("");
+  placeWords();
+  fillGrid();
+  renderGrid();
 
-      if(words.includes(word)){
-        document.querySelectorAll(".selected").forEach(c=>{
-          c.classList.remove("selected");
-          c.classList.add("found");
-        });
-        selected=[];
+  document.getElementById("word-list").textContent =
+    words.join(", ");
+}
+
+function placeWords() {
+  words.forEach(word => {
+    let placed = false;
+    let attempts = 0;
+
+    while (!placed && attempts < 100) {
+      let row = Math.floor(Math.random() * size);
+      let col = Math.floor(Math.random() * size);
+      let horizontal = Math.random() > 0.5;
+
+      if (horizontal && col + word.length <= size) {
+        let fits = true;
+        for (let i = 0; i < word.length; i++) {
+          if (grid[row][col + i] !== "") fits = false;
+        }
+        if (fits) {
+          for (let i = 0; i < word.length; i++) {
+            grid[row][col + i] = word[i];
+          }
+          placed = true;
+        }
       }
-    };
 
-    gridDiv.appendChild(cell);
+      if (!horizontal && row + word.length <= size) {
+        let fits = true;
+        for (let i = 0; i < word.length; i++) {
+          if (grid[row + i][col] !== "") fits = false;
+        }
+        if (fits) {
+          for (let i = 0; i < word.length; i++) {
+            grid[row + i][col] = word[i];
+          }
+          placed = true;
+        }
+      }
+
+      attempts++;
+    }
   });
-});
+}
 
-document.getElementById("words").textContent = "Find: " + words.join(", ");
+function fillGrid() {
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r][c] === "") {
+        grid[r][c] =
+          String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      }
+    }
+  }
+}
+
+function renderGrid() {
+  const gridDiv = document.getElementById("grid");
+  gridDiv.innerHTML = "";
+
+  grid.forEach(row => {
+    row.forEach(letter => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = letter;
+
+      cell.addEventListener("mousedown", () => {
+        isDragging = true;
+        clearSelection();
+        select(cell);
+      });
+
+      cell.addEventListener("mouseover", () => {
+        if (isDragging) select(cell);
+      });
+
+      cell.addEventListener("mouseup", () => {
+        isDragging = false;
+        checkWord();
+      });
+
+      gridDiv.appendChild(cell);
+    });
+  });
+
+  document.body.addEventListener("mouseup", () => isDragging = false);
+}
+
+function select(cell) {
+  if (!cell.classList.contains("selected")) {
+    cell.classList.add("selected");
+    selected.push(cell);
+  }
+}
+
+function clearSelection() {
+  selected.forEach(c => c.classList.remove("selected"));
+  selected = [];
+}
+
+function checkWord() {
+  let word = selected.map(c => c.textContent).join("");
+
+  if (words.includes(word)) {
+    selected.forEach(c => {
+      c.classList.remove("selected");
+      c.classList.add("found");
+    });
+  } else {
+    clearSelection();
+  }
+}
+
+function resetGame() {
+  selected = [];
+  init();
+}
+
+init();
 </script>
 
 </body>
 </html>
+
