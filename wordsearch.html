@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Word Search - Elias Valenzuela</title>
+
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 30px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .cell {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border: 1px solid black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .selected { background: lightblue; }
+    .found { background: lightgreen; }
+  </style>
+</head>
+
+<body>
+
+<h1>Word Search</h1>
+
+<div class="grid" id="grid"></div>
+
+<p id="words"></p>
+
+<p><a href="index.html">⬅ Back to Home</a></p>
+
+<script>
+const words = [
+"TEXAS","AUSTIN","BUSINESS","HEB","SHOPPER",
+"LEADERSHIP","TRAVEL","GOALS","SUCCESS","TEAM",
+"MCCOMBS","STUDENT","ENERGY","MUSIC","SPORT",
+"FOCUS","DRIVE","GROWTH","VISION","CREATE"
+];
+
+const size = 12;
+let grid = Array(size).fill().map(() => Array(size).fill(""));
+
+function placeWord(word) {
+  let placed = false;
+  while (!placed) {
+    let dir = Math.random() > 0.5;
+    let row = Math.floor(Math.random() * size);
+    let col = Math.floor(Math.random() * size);
+
+    if (dir && col + word.length < size) {
+      let ok = true;
+      for (let i=0;i<word.length;i++) if(grid[row][col+i]!="") ok=false;
+      if(ok){
+        for (let i=0;i<word.length;i++) grid[row][col+i]=word[i];
+        placed=true;
+      }
+    }
+
+    if (!dir && row + word.length < size) {
+      let ok = true;
+      for (let i=0;i<word.length;i++) if(grid[row+i][col]!="") ok=false;
+      if(ok){
+        for (let i=0;i<word.length;i++) grid[row+i][col]=word[i];
+        placed=true;
+      }
+    }
+  }
+}
+
+words.forEach(placeWord);
+
+for (let r=0;r<size;r++){
+  for (let c=0;c<size;c++){
+    if(grid[r][c]==""){
+      grid[r][c]=String.fromCharCode(65+Math.floor(Math.random()*26));
+    }
+  }
+}
+
+const gridDiv = document.getElementById("grid");
+let selected = [];
+
+grid.forEach((row)=>{
+  row.forEach((letter)=>{
+    let cell=document.createElement("div");
+    cell.className="cell";
+    cell.textContent=letter;
+
+    cell.onclick=()=>{
+      cell.classList.toggle("selected");
+      selected.push(letter);
+      let word=selected.join("");
+
+      if(words.includes(word)){
+        document.querySelectorAll(".selected").forEach(c=>{
+          c.classList.remove("selected");
+          c.classList.add("found");
+        });
+        selected=[];
+      }
+    };
+
+    gridDiv.appendChild(cell);
+  });
+});
+
+document.getElementById("words").textContent = "Find: " + words.join(", ");
+</script>
+
+</body>
+</html>
