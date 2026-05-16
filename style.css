@@ -2,7 +2,7 @@
 /* ---- Page basics ---- */
 body {
   background-color:#2D68C4;         /* burnt orange background */
-  color: #14213D;                     /* navy text for contrast  */
+  color: #FFFFFF;                     /* navy text for contrast  */
   font-family: Georgia, "Times New Roman", serif;
   max-width: 900px;
   margin: 0 auto;                     /* centers the whole page  */
