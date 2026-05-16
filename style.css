@@ -1,12 +1,3 @@
-/* ============================================================
-   Clint Tuttle's Webpage - style.css
-   ============================================================
-   Color palette (UT Austin inspired):
-   - Burnt orange: #BF5700  (primary background)
-   - Navy:        #14213D   (primary text)
-   - Khaki:       #E8DCC4   (cards / content panels)
-   - White:       #FFFFFF   (highlights and contrast)
-   ============================================================ */
 
 /* ---- Page basics ---- */
 body {
@@ -22,8 +13,8 @@ body {
 /* ---- Page title ---- */
 .page-title {
   text-align: center;
-  color: #14213D;                     /* navy title */
-  background-color: #E8DCC4;          /* khaki bar behind title */
+  color: ##2C2C2C;                     /* navy title */
+  background-color: #14213D;          /* khaki bar behind title */
   font-size: 42px;
   font-weight: bold;
   padding: 20px;
